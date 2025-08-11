@@ -1,0 +1,54 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentName": {
+      "value": "${AZURE_ENV_NAME}"
+    },
+    "location": {
+      "value": "${AZURE_LOCATION}"
+    },
+    "resourceGroupName": {
+      "value": "rg-yompagai-dev"
+    },
+    "sqlServerName": {
+      "value": "sql-yompagai-dev"
+    },
+    "sqlDatabaseName": {
+      "value": "sqldb-yompagai-dev"
+    },
+    "existingSqlResourceGroup": {
+      "value": "rg-yompagai-dev"
+    },
+    "createNewSqlResources": {
+      "value": false
+    },
+    "mcpHttpHost": {
+      "value": "0.0.0.0"
+    },
+    "mcpHttpPort": {
+      "value": "8000"
+    },
+    "mcpApiPath": {
+      "value": "/mcp"
+    },
+    "mcpHealthPath": {
+      "value": "/health"
+    },
+    "mcpMetricsPath": {
+      "value": "/metrics"
+    },
+    "mcpConnectionTimeout": {
+      "value": "30"
+    },
+    "mcpRequestTimeout": {
+      "value": "120"
+    },
+    "mcpHeartbeatInterval": {
+      "value": "60"
+    },
+    "mcpEnableErrorRecovery": {
+      "value": "true"
+    }
+  }
+}

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure SQL MCP Server - SSE Client</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .tool-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        .config {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .config input {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            width: 150px;
+        }
+        .loading {
+            color: #007bff;
+            font-style: italic;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Azure SQL MCP Server - SSE Client</h1>
+        
+        <div class="config">
+            <h3>SSE Configuration</h3>
+            <label>Host: <input type="text" id="host" value="127.0.0.1"></label>
+            <label>Port: <input type="number" id="port" value="8000"></label>
+            <label>SSE Path: <input type="text" id="ssePath" value="/sse"></label>
+            <label>Message Path: <input type="text" id="messagePath" value="/message"></label>
+            <button onclick="connect()">Connect</button>
+            <button onclick="disconnect()">Disconnect</button>
+        </div>
+        
+        <div id="status" class="status disconnected">❌ Disconnected</div>
+        
+        <div class="tool-buttons">
+            <button onclick="callTool('list_tables')" disabled id="btn-list_tables">List Tables</button>
+            <button onclick="callTool('database_info')" disabled id="btn-database_info">Database Info</button>
+            <button onclick="callTool('list_available_tools')" disabled id="btn-list_available_tools">Available Tools</button>
+            <button onclick="describeTable()" disabled id="btn-describe_table">Describe Table</button>
+            <button onclick="readData()" disabled id="btn-read_data">Read Data</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+        
+        <div id="output" class="output">Ready to connect to Azure SQL MCP Server...\n\nClick "Connect" to establish SSE connection.</div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let isConnected = false;
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            let prefix = '';
+            
+            switch(type) {
+                case 'error':
+                    prefix = '❌ ERROR: ';
+                    break;
+                case 'success':
+                    prefix = '✅ SUCCESS: ';
+                    break;
+                case 'loading':
+                    prefix = '⏳ LOADING: ';
+                    break;
+                case 'info':
+                default:
+                    prefix = 'ℹ️ INFO: ';
+                    break;
+            }
+            
+            output.textContent += `[${timestamp}] ${prefix}${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateConnectionStatus(connected) {
+            isConnected = connected;
+            const buttons = document.querySelectorAll('button[id^="btn-"]');
+            
+            if (connected) {
+                status.className = 'status connected';
+                status.textContent = '✅ Connected to SSE Server';
+                buttons.forEach(btn => btn.disabled = false);
+            } else {
+                status.className = 'status disconnected';
+                status.textContent = '❌ Disconnected';
+                buttons.forEach(btn => btn.disabled = true);
+            }
+        }
+
+        function connect() {
+            if (eventSource) {
+                disconnect();
+            }
+
+            const host = document.getElementById('host').value;
+            const port = document.getElementById('port').value;
+            const ssePath = document.getElementById('ssePath').value;
+            
+            const sseUrl = `http://${host}:${port}${ssePath}`;
+            
+            log(`Connecting to SSE server: ${sseUrl}`, 'loading');
+            
+            eventSource = new EventSource(sseUrl);
+            
+            eventSource.onopen = function(event) {
+                log('SSE connection established successfully!', 'success');
+                updateConnectionStatus(true);
+            };
+            
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    log(`Received: ${JSON.stringify(data, null, 2)}`, 'info');
+                } catch (e) {
+                    log(`Received (raw): ${event.data}`, 'info');
+                }
+            };
+            
+            eventSource.onerror = function(event) {
+                log('SSE connection error occurred', 'error');
+                updateConnectionStatus(false);
+                if (eventSource.readyState === EventSource.CLOSED) {
+                    log('SSE connection closed', 'error');
+                }
+            };
+        }
+
+        function disconnect() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                log('Disconnected from SSE server', 'info');
+                updateConnectionStatus(false);
+            }
+        }
+
+        async function callTool(toolName, params = {}) {
+            if (!isConnected) {
+                log('Not connected to server', 'error');
+                return;
+            }
+
+            const host = document.getElementById('host').value;
+            const port = document.getElementById('port').value;
+            const messagePath = document.getElementById('messagePath').value;
+            
+            const messageUrl = `http://${host}:${port}${messagePath}`;
+            
+            log(`Calling tool: ${toolName}`, 'loading');
+            
+            try {
+                const response = await fetch(messageUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: Date.now(),
+                        method: 'tools/call',
+                        params: {
+                            name: toolName,
+                            arguments: params
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                log(`Tool result: ${JSON.stringify(result, null, 2)}`, 'success');
+                
+            } catch (error) {
+                log(`Tool call failed: ${error.message}`, 'error');
+            }
+        }
+
+        function describeTable() {
+            const tableName = prompt('Enter table name to describe:', 'Article');
+            if (tableName) {
+                callTool('describe_table', { table_name: tableName });
+            }
+        }
+
+        function readData() {
+            const query = prompt('Enter SQL query:', 'SELECT TOP 5 * FROM Article');
+            if (query) {
+                callTool('read_data', { query: query, limit: 10 });
+            }
+        }
+
+        function clearOutput() {
+            output.textContent = '';
+            log('Output cleared', 'info');
+        }
+
+        // Auto-connect on page load
+        window.addEventListener('load', function() {
+            log('Azure SQL MCP Server SSE Client loaded', 'info');
+            log('Configure connection settings and click Connect', 'info');
+        });
+    </script>
+</body>
+</html>

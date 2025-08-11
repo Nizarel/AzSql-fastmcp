@@ -1,0 +1,6 @@
+pyodbc>=5.2.0
+fastmcp>=2.10.4
+python-dotenv>=1.1.1
+tenacity>=9.1.2
+azure-identity>=1.15.0
+azure-core>=1.29.0
