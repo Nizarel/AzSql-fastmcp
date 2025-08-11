@@ -68,21 +68,11 @@ class ServerCore:
             base_delay=self.server_config.connection_retry_delay
         )
         
-        # Initialize FastMCP with enhanced 2.10.4 features
+        # Initialize FastMCP (keep constructor args compatible across versions)
         http_config = self.server_config.get_http_config()
         self.mcp = FastMCP(
             name=self.server_config.server_name,
-            lifespan=self._lifespan,
-            streamable_http_path=http_config['api_path'],
-            stateless_http=http_config['stateless_http'],
-            json_response=http_config['json_response'],
-            host=http_config['host'],
-            port=http_config['port'],
-            debug=http_config['debug_mode'],
-            mask_error_details=False,  # We want detailed errors for debugging
-            cache_expiration_seconds=300.0,  # Cache responses for 5 minutes
-            on_duplicate_tools="warn",  # Warn on duplicate tool registration
-            tool_serializer=lambda x: str(x) if x is not None else ""  # Custom serializer
+            lifespan=self._lifespan
         )
         
         # Initialize managers
