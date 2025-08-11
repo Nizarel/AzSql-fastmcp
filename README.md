@@ -48,6 +48,7 @@ A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azu
 ## 🏗️ Modern Architecture Overview
 
 ### **FastMCP 2.11.2+ Streaming HTTP Architecture**
+![alt text](image.png)
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
