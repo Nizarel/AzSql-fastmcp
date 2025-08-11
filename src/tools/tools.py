@@ -7,6 +7,13 @@ import logging
 from typing import Dict
 from fastmcp import Context
 from .base_tool import BaseTool
+from .list_tables import ListTables
+from .describe_table import DescribeTable
+from .read_data import ReadData
+from .insert_data import InsertData
+from .update_data import UpdateData
+from .list_stored_procedures import ListStoredProcedures
+from .execute_stored_procedure import ExecuteStoredProcedure
 
 
 logger = logging.getLogger("azure_sql_tools")
@@ -21,11 +28,7 @@ class Tools:
     
     def _register_tools(self):
         """Register all available tools"""
-        from .list_tables import ListTables
-        from .describe_table import DescribeTable
-        from .read_data import ReadData
-        from .insert_data import InsertData
-        from .update_data import UpdateData
+    # imports moved to module level to avoid indentation issues
         
         # Register individual tools
         tools_to_register = [
@@ -33,7 +36,9 @@ class Tools:
             DescribeTable(),
             ReadData(),
             InsertData(),
-            UpdateData()
+            UpdateData(),
+            ListStoredProcedures(),
+            ExecuteStoredProcedure()
         ]
         
         for tool in tools_to_register:
@@ -81,3 +86,16 @@ class Tools:
     async def update_data(self, ctx: Context, sql: str) -> str:
         """Update or delete data in the database"""
         return await self.execute_tool("update_data", ctx, sql=sql)
+
+    async def list_stored_procedures(self, ctx: Context) -> str:
+        """List all stored procedures in the database"""
+        return await self.execute_tool("list_stored_procedures", ctx)
+
+    async def execute_stored_procedure(self, ctx: Context, procedure_name: str, parameters: dict = None, schema: str = "dbo") -> str:
+        """Execute a stored procedure with optional parameters"""
+        return await self.execute_tool(
+            "execute_stored_procedure", ctx,
+            procedure_name=procedure_name,
+            parameters=parameters or {},
+            schema=schema,
+        )

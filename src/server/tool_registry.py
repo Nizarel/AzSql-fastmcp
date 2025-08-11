@@ -96,6 +96,39 @@ class ToolRegistry:
             except Exception as e:
                 logger.error(f"Critical error in update_data: {e}", exc_info=True)
                 return f"❌ Critical error updating data: {str(e)}"
+
+        @self.mcp.tool()
+        async def list_stored_procedures(ctx: Context) -> str:
+            """List all stored procedures in the database"""
+            try:
+                tool = self.tools.get_tool("list_stored_procedures")
+                return await tool.safe_execute(ctx)
+            except Exception as e:
+                logger.error(f"Critical error in list_stored_procedures: {e}", exc_info=True)
+                return f"❌ Critical error listing stored procedures: {str(e)}"
+
+        @self.mcp.tool()
+        async def execute_stored_procedure(ctx: Context, procedure_name: str, parameters: str = None, schema: str = "dbo") -> str:
+            """Execute a stored procedure with optional parameters
+
+            Args:
+                procedure_name: Name of the stored procedure to execute
+                parameters: JSON string of parameter names and values (optional)
+                schema: Schema name (default: dbo)
+            """
+            try:
+                tool = self.tools.get_tool("execute_stored_procedure")
+                parsed = {}
+                if parameters:
+                    try:
+                        import json as _json
+                        parsed = _json.loads(parameters)
+                    except Exception:
+                        return "❌ Error: parameters must be a valid JSON object string"
+                return await tool.safe_execute(ctx, procedure_name=procedure_name, parameters=parsed, schema=schema)
+            except Exception as e:
+                logger.error(f"Critical error in execute_stored_procedure: {e}", exc_info=True)
+                return f"❌ Critical error executing stored procedure: {str(e)}"
         
         @self.mcp.tool()
         async def database_info(ctx: Context) -> str:
@@ -187,7 +220,8 @@ class ToolRegistry:
         # Track registered tools - ALL TOOLS REGISTERED ATOMICALLY
         self._registered_tools = [
             "list_tables", "describe_table", "read_data", "insert_data", 
-            "update_data", "database_info", "health_check", "list_available_tools"
+            "update_data", "list_stored_procedures", "execute_stored_procedure",
+            "database_info", "health_check", "list_available_tools"
         ]
         
         logger.info(f"✅ Registered {len(self._registered_tools)} tools atomically (including health_check)")
@@ -211,5 +245,6 @@ class ToolRegistry:
         return {
             "data_operations": ["list_tables", "describe_table", "read_data"],
             "data_modification": ["insert_data", "update_data"], 
+            "stored_procedures": ["list_stored_procedures", "execute_stored_procedure"],
             "server_management": ["database_info", "health_check", "list_available_tools"]
         }
