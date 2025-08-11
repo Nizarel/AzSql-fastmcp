@@ -165,7 +165,7 @@ AZURE_SQL_DATABASE=your-database-name
 
 # Managed Identity Authentication (NEW)
 AZURE_SQL_AUTH_TYPE=managed_identity
-AZURE_MANAGED_IDENTITY_CLIENT_ID=id-AcraSalesAnalytics2
+AZURE_MANAGED_IDENTITY_CLIENT_ID=id-managedidentity
 
 # Connection Settings
 AZURE_SQL_DRIVER=ODBC Driver 17 for SQL Server
