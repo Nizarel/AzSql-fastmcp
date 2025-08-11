@@ -1,6 +1,6 @@
 # Azure SQL Database MCP Server v4.0 (Enhanced Security with Managed Identity)
 
-A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azure SQL Database operations. Built with modern FastMCP 2.9.2+ streaming HTTP transport and **enhanced with Azure Managed Identity authentication** for enterprise security. This server delivers exceptional performance, reliability, and scalability for mission-critical database workloads with zero-credential security architecture.
+A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azure SQL Database operations. Built with modern FastMCP 2.11.2+ streaming HTTP transport and **enhanced with Azure Managed Identity authentication** for enterprise security. This server delivers exceptional performance, reliability, and scalability for mission-critical database workloads with zero-credential security architecture.
 
 ---
 
@@ -14,13 +14,13 @@ A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azu
 - **📋 Automatic Token Management**: Seamless token acquisition, refresh, and rotation
 
 ### 🏛️ **Enterprise Architecture**
-- **Modern Streaming HTTP Transport**: Built on FastMCP 2.9.2+ with high-performance streaming HTTP
+- **Modern Streaming HTTP Transport**: Built on FastMCP 2.11.2+ with high-performance streaming HTTP
 - **Modular Object-Oriented Design**: Clean separation of concerns, enterprise-grade maintainability
 - **Production-Ready Scalability**: Async connection pooling, concurrent request handling, optimized performance
 - **Comprehensive Error Handling**: Graceful failure recovery, detailed error reporting, robust exception management
 
 ### ⚡ **Advanced Transport Layer**
-- **FastMCP 2.9.2+ Streaming HTTP**: Modern, efficient streaming transport protocol
+- **FastMCP 2.11.2+ Streaming HTTP**: Modern, efficient streaming transport protocol
 - **Multiple Endpoint Support**: Dedicated `/mcp`, `/health`, and `/metrics` endpoints
 - **Real-time Streaming**: Server-Sent Events (SSE) for real-time data streaming
 - **Optimized Performance**: Compression, CORS support, configurable concurrency limits
@@ -47,7 +47,7 @@ A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azu
 
 ## 🏗️ Modern Architecture Overview
 
-### **FastMCP 2.9.2+ Streaming HTTP Architecture**
+### **FastMCP 2.11.2+ Streaming HTTP Architecture**
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
@@ -63,7 +63,7 @@ A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azu
                   └───────────┬───────────┘
                               │
         ┌─────────────────────▼─────────────────────┐
-        │          FastMCP 2.9.2+ Server          │
+        │          FastMCP 2.11.2+ Server          │
         │        (Streaming HTTP Transport)        │
         ├─────────────────────┬─────────────────────┤
         │  /mcp (Main API)    │  Custom Endpoints   │
@@ -76,7 +76,7 @@ A production-ready, enterprise-grade Model Context Protocol (MCP) server for Azu
         │           Server Core Architecture        │
         ├─────────────────────┬─────────────────────┤
         │   Tool Registry     │  Resource Manager   │
-        │   • 8 Database Tools│  • Schema Resources │
+        │   • 11 Database Tools│  • Schema Resources │
         │   • Health Checks   │  • Status Resources │
         │   • Utility Tools   │  • Table Resources  │
         └─────────────────────┼─────────────────────┘
@@ -134,7 +134,7 @@ src/
 - Python 3.8+ (Recommended: Python 3.11+)
 - Azure SQL Database instance
 - ODBC Driver 18 for SQL Server
-- FastMCP 2.9.2+ compatible environment
+- FastMCP 2.11.2+ compatible environment
 
 ### **1. Environment Setup**
 
@@ -213,7 +213,7 @@ python test/test_managed_identity.py
 ### **3. FastMCP Transport Configuration**
 
 ```env
-# FastMCP 2.9.2+ Streaming HTTP Transport
+# FastMCP 2.11.2+ Streaming HTTP Transport
 MCP_HOST=127.0.0.1
 MCP_PORT=8000
 MCP_API_PATH=/mcp
@@ -243,7 +243,7 @@ TEST_MODE=false
 ### **4. Start the Server**
 
 ```bash
-# Start the FastMCP 2.9.2+ streaming HTTP server
+# Start the FastMCP 2.11.2+ streaming HTTP server
 python src/server.py
 ```
 
@@ -286,7 +286,7 @@ The server exposes three main HTTP endpoints optimized for different use cases:
 
 ### **Primary MCP Endpoint**
 - **URL**: `http://127.0.0.1:8000/mcp`
-- **Protocol**: FastMCP 2.9.2+ Streaming HTTP
+- **Protocol**: FastMCP 2.11.2+ Streaming HTTP
 - **Content-Type**: `text/event-stream` (Server-Sent Events)
 - **Purpose**: Main MCP protocol operations (tools, resources, prompts)
 - **Features**: Real-time streaming, bidirectional communication, protocol compliance
@@ -368,7 +368,7 @@ Intelligent prompts provide guided assistance for complex database operations:
 
 - **Async Architecture**: Fully asynchronous operations for maximum concurrency
 - **Connection Pooling**: Optional connection pooling for high-throughput scenarios
-- **Stream Optimization**: FastMCP 2.9.2+ streaming for efficient real-time communication
+- **Stream Optimization**: FastMCP 2.11.2+ streaming for efficient real-time communication
 - **Request Limiting**: Configurable limits to prevent resource exhaustion and abuse
 - **Memory Management**: Optimized memory usage with streaming results and pagination
 
@@ -540,7 +540,7 @@ async def custom_endpoint(request: Request):
 
 - **Unit Tests**: Individual component testing with mocking and isolation
 - **Integration Tests**: End-to-end testing with real database connections
-- **Protocol Tests**: FastMCP 2.9.2+ protocol compliance verification
+- **Protocol Tests**: FastMCP 2.11.2+ protocol compliance verification
 - **Performance Tests**: Load testing and benchmarking for production readiness
 - **Security Tests**: SQL injection prevention and access control validation
 
@@ -653,11 +653,11 @@ MAX_REQUEST_HISTORY=1000
 
 ## 📈 Version History & Improvements
 
-### **v3.1 (Current) - FastMCP 2.9.2+ Streaming HTTP**
+### **v3.1 (Current) - FastMCP 2.11.2+ Streaming HTTP**
 
 | Feature | v3.0 (SSE) | v3.1 (Streaming HTTP) | Improvement |
 |---------|------------|----------------------|-------------|
-| **Transport Protocol** | Server-Sent Events | FastMCP 2.9.2+ Streaming HTTP | Modern, efficient, standards-compliant |
+| **Transport Protocol** | Server-Sent Events | FastMCP 2.11.2+ Streaming HTTP | Modern, efficient, standards-compliant |
 | **Endpoints** | `/api`, `/sse` | `/mcp`, `/health`, `/metrics` | Clear separation, better monitoring |
 | **Performance** | Good | Excellent | Optimized streaming, compression, concurrency |
 | **Monitoring** | Basic | Comprehensive | Dedicated health/metrics endpoints |
@@ -667,7 +667,7 @@ MAX_REQUEST_HISTORY=1000
 
 ### **Key Improvements in v3.1**
 
-- ✅ **Modern Transport**: Upgraded to FastMCP 2.9.2+ streaming HTTP from deprecated SSE
+- ✅ **Modern Transport**: Upgraded to FastMCP 2.11.2+ streaming HTTP from deprecated SSE
 - ✅ **Custom Endpoints**: Added `/health` and `/metrics` endpoints for comprehensive monitoring
 - ✅ **Enhanced Configuration**: Full support for FastMCP advanced features and optimization
 - ✅ **Improved Performance**: Streaming optimizations, compression, and concurrency improvements
@@ -717,7 +717,7 @@ MAX_REQUEST_HISTORY=1000
 ## 📄 Documentation & Resources
 
 ### **Core Documentation**
-- [FastMCP 2.9.2+ Optimization Summary](FASTMCP_292_OPTIMIZATION.md)
+- [FastMCP 2.11.2+ Optimization Summary](FASTMCP_292_OPTIMIZATION.md)
 - [Streaming HTTP Update Guide](STREAMING_HTTP_UPDATE.md)
 - [Endpoint Fix Summary](ENDPOINT_FIX_SUMMARY.md)
 - [End-to-End Test Results](END_TO_END_TEST_RESULTS.md)
@@ -756,7 +756,7 @@ MAX_REQUEST_HISTORY=1000
 - 💬 Community: Join discussions for best practices and use cases
 
 **Version**: v3.1.0  
-**FastMCP Compatibility**: 2.9.2+  
+**FastMCP Compatibility**: 2.11.2+  
 **Python Compatibility**: 3.8+ (Recommended: 3.11+)  
 **Azure SQL Database**: All service tiers supported  
 
